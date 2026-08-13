@@ -1,0 +1,34 @@
+name: False positive report
+description: A rule fired somewhere it shouldn't have — the single most valuable signal for a rubric, please report it even without a fix
+labels: ["false-positive"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        You don't need a fix in hand — the report itself is the valuable part. It usually
+        turns into either a rule-wording change or an annotator precision fix; either way,
+        your report becomes the regression test.
+  - type: input
+    id: rule
+    attributes:
+      label: Which rule fired
+      placeholder: "e.g. X001"
+    validations:
+      required: true
+  - type: textarea
+    id: target
+    attributes:
+      label: The actual tool/resource/prompt metadata
+      description: >
+        The real name, description, and schema text that triggered the rule — paste the
+        actual content, not a paraphrase. This is what becomes the regression fixture.
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: why-wrong
+    attributes:
+      label: Why this shouldn't have fired
+      description: What makes this a legitimate design choice rather than the problem the rule is meant to catch?
+    validations:
+      required: true

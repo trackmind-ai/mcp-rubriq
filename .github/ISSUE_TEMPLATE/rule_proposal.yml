@@ -1,0 +1,49 @@
+name: Rule proposal
+description: Propose a new rule for the rubric — an MCP anti-pattern MCP-Rubriq doesn't currently grade
+labels: ["rule-proposal"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check [`docs/boundaries.md`](../../docs/boundaries.md) §A first — several rule ideas
+        are already scoped there as known good-first-issue gaps, with the reasoning for why
+        they're not shipped yet already written down. If your idea is about *behavioral*
+        checks, auth/transport security, or anything needing to actually call a tool, read
+        §C first — that's a different, deliberately out-of-scope kind of tool, not a
+        missing rule.
+  - type: textarea
+    id: anti-pattern
+    attributes:
+      label: The anti-pattern
+      description: What's the actual MCP design problem, and why does it hurt an agent using the server?
+    validations:
+      required: true
+  - type: dropdown
+    id: static
+    attributes:
+      label: Is this statically detectable from metadata alone?
+      description: >
+        MCP-Rubriq never calls a tool — it only reads names, descriptions, schemas, and
+        declared annotations. If catching this needs observing runtime behavior, it's
+        out of scope for MCP-Rubriq itself (see docs/boundaries.md §C).
+      options:
+        - "Yes — detectable from tool/resource/prompt metadata alone"
+        - "No — needs calling the tool or observing runtime behavior"
+        - "Not sure"
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: A concrete example
+      description: A real or realistic tool/resource/prompt definition that should fail this rule, and ideally one that looks similar but should pass.
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: severity
+    attributes:
+      label: Suggested severity and category
+      description: error / warning / info, and which existing category it fits (Tool Quality, Schema Integrity, Architecture, Resource & Prompt Quality, Security Signals) or whether it needs a new one.
+    validations:
+      required: false

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "trackmind-dev",
+  "owner": {
+    "name": "Trackmind",
+    "email": "oss@trackmind.com"
+  },
+  "description": "LOCAL DEVELOPMENT ONLY. Lets `make load` / `tasks.ps1 load` install this checkout as a plugin. The published catalog is trackmind-ai/marketplace, whose marketplace name is `trackmind` \u2014 this one is deliberately named differently so adding it can never replace the published one.",
+  "plugins": [
+    {
+      "name": "mcp-rubriq",
+      "source": "./plugins/mcp-rubriq",
+      "description": "Grades MCP (Model Context Protocol) servers against a published 28-rule quality rubric.",
+      "category": "quality",
+      "keywords": [
+        "mcp",
+        "linter",
+        "model-context-protocol",
+        "quality",
+        "security"
+      ]
+    }
+  ]
+}

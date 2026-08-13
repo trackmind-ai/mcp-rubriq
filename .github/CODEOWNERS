@@ -1,0 +1,20 @@
+# SPDX-FileCopyrightText: 2026 Trackmind
+# SPDX-License-Identifier: MIT
+#
+# Enforces the two-tier contribution model from CONTRIBUTING.md. Combined with branch
+# protection's "require CODEOWNERS review" (R4.3), this makes the maintainer-gated lanes
+# mechanical rather than a matter of remembering. @trackmind-ai/maintainers must exist as a
+# real GitHub team before this resolves — create it as part of the R4 org setup.
+
+# Maintainer-gated: trusted-judge-input surfaces (CONTRIBUTING.md Lane A / Lane C)
+/plugins/mcp-rubriq/skills/mcp-rubriq/SKILL.md               @trackmind-ai/maintainers
+/plugins/mcp-rubriq/skills/mcp-rubriq/rulebook/rules/        @trackmind-ai/maintainers
+
+# Maintainer-gated: core pipeline contracts (CONTRIBUTING.md Lane B)
+/plugins/mcp-rubriq/skills/mcp-rubriq/introspection/         @trackmind-ai/maintainers
+/plugins/mcp-rubriq/skills/mcp-rubriq/rulebook/annotator.py  @trackmind-ai/maintainers
+/plugins/mcp-rubriq/skills/mcp-rubriq/models/                @trackmind-ai/maintainers
+
+# Open lane (no owner pin = normal, lighter review path): fixtures, docs
+# /tests/fixtures/
+# /docs/

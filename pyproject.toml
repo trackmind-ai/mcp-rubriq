@@ -1,0 +1,40 @@
+[project]
+name = "mcp-rubriq"
+description = "Grades MCP (Model Context Protocol) servers against a published 28-rule quality rubric."
+version = "0.1.0"  # keep in sync with plugins/mcp-rubriq/.claude-plugin/plugin.json
+requires-python = ">=3.10"  # inherited floor: the `mcp` package itself requires >=3.10
+dependencies = []  # the plugin's own runtime deps are declared where it ships from —
+                    # see plugins/mcp-rubriq/skills/mcp-rubriq/introspection/requirements.txt
+                    # and the PEP 723 block in scripts/lint.py. This table exists for
+                    # dev tooling (pytest/ruff/pyright), not for building/publishing a package.
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.6.0",
+    "pyright>=1.1.0",
+]
+
+[tool.pyright]
+extraPaths = ["plugins/mcp-rubriq/skills/mcp-rubriq"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+# Modest to start: pyflakes, pycodestyle errors, import sorting, pyupgrade,
+# and a few high-signal bugbear checks. Deliberately not turning on stricter
+# rulesets (docstrings, complexity, etc.) yet — see docs/boundaries.md's
+# spirit of "grow deliberately, not by default." Widen this later if it earns
+# its place, rather than drowning early contributor PRs in style nits.
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# tests/fixtures/*.py are MCP *server* scripts used as test subjects, not
+# pytest test modules themselves — collecting them as tests would fail/hang.
+addopts = "--ignore=tests/fixtures"
+markers = [
+    "slow: exercises a real published server or downloads a dependency (e.g. Puppeteer/Chromium) on first run",
+]

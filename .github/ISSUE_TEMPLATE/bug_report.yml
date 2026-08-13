@@ -1,0 +1,42 @@
+name: Bug report
+description: Something in the pipeline crashed, hung, or produced a wrong grade
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a rule firing incorrectly on a *specific server* (not a crash), use the
+        **False positive** template instead — it's a more useful shape for that report.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what actually happened.
+      placeholder: |
+        Ran `/mcp-rubriq <target>` against ... and it ... instead of ...
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      description: >
+        The exact target/invocation, ideally something we can run ourselves — a public
+        server, or a minimal fixture server you can paste inline.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Python version, `mcp`/`pydantic`/`anyio` versions if relevant, transport (stdio/SSE/HTTP).
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant output
+      description: Error JSON, traceback, or the actual vs. expected report content. Paste as text, not a screenshot.
+      render: shell
+    validations:
+      required: false

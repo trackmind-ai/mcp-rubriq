@@ -1,0 +1,66 @@
+{
+  "_comment": "Deterministic launch registry for common published MCP servers. Capped at ~10 entries by design (see roadmap Review Notes) — this is not meant to be an exhaustive package index. Anything not listed here falls back to model knowledge, flagged as unverified.",
+  "filesystem": {
+    "transport": "stdio",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-filesystem"],
+    "env": []
+  },
+  "fetch": {
+    "transport": "stdio",
+    "command": "uvx",
+    "args": ["mcp-server-fetch"],
+    "env": [],
+    "_note": "Not an npm package — @modelcontextprotocol/server-fetch 404s. Distributed as a Python package, launched via uvx."
+  },
+  "everything": {
+    "transport": "stdio",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-everything"],
+    "env": []
+  },
+  "git": {
+    "transport": "stdio",
+    "command": "uvx",
+    "args": ["mcp-server-git", "--repository", "<path>"],
+    "env": [],
+    "_note": "Not an npm package — @modelcontextprotocol/server-git 404s. Distributed as a Python package, launched via uvx. --repository is required; substitute <path> with the target repo."
+  },
+  "memory": {
+    "transport": "stdio",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-memory"],
+    "env": []
+  },
+  "sqlite": {
+    "transport": "stdio",
+    "command": "uvx",
+    "args": ["mcp-server-sqlite", "--db-path", "<path>"],
+    "env": [],
+    "_note": "Not an npm package — @modelcontextprotocol/server-sqlite 404s (archived from the npm scope). Distributed as a Python package, launched via uvx. --db-path is required; substitute <path> with the target database file."
+  },
+  "github": {
+    "transport": "stdio",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-github"],
+    "env": ["GITHUB_TOKEN"]
+  },
+  "brave-search": {
+    "transport": "stdio",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+    "env": ["BRAVE_API_KEY"]
+  },
+  "puppeteer": {
+    "transport": "stdio",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
+    "env": []
+  },
+  "slack": {
+    "transport": "stdio",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-slack"],
+    "env": ["SLACK_BOT_TOKEN", "SLACK_TEAM_ID"]
+  }
+}

@@ -1,0 +1,4 @@
+# Development/test dependencies for the MCP-Rubriq test suite.
+# The plugin itself only needs plugins/mcp-rubriq/skills/mcp-rubriq/introspection/requirements.txt.
+-r ../plugins/mcp-rubriq/skills/mcp-rubriq/introspection/requirements.txt
+pytest>=8.0.0

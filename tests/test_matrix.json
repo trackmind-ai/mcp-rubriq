@@ -1,0 +1,1207 @@
+{
+  "_comment": "Data-driven test matrix, consumed by tests/run_test_matrix.py. Commands are relative to the repo root (the runner's cwd). Expectations for failure-mode cases are EMPIRICAL — set from observed behavior, with notes explaining why that behavior is correct.",
+  "cases": [
+    {
+      "id": "TM-001",
+      "category": "custom-stdio-baseline",
+      "description": "Minimal well-formed server — regression baseline.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/sample_server.py",
+      "timeout": 15,
+      "subprocess_timeout": 30,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 3
+        },
+        {
+          "path": "resources.0.uri",
+          "eq": "file:///workspace",
+          "note": "resource content reaches the judge."
+        },
+        {
+          "path": "prompts.0.name",
+          "eq": "summarize",
+          "note": "prompt content reaches the judge."
+        },
+        {
+          "path": "introspection_warnings",
+          "eq": [],
+          "note": "A clean run must report zero introspection warnings."
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-002",
+      "category": "custom-stdio-schema-edge-cases",
+      "description": "Tools using $ref/$defs, allOf, oneOf, and outputSchema — probes _map_tool's flat-schema assumption.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/schema_edge_cases_server.py",
+      "timeout": 15,
+      "subprocess_timeout": 30,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 4
+        },
+        {
+          "path": "tools.0.annotations.schema_empty",
+          "eq": false,
+          "note": "G1 — $ref/$defs schema resolves to its real properties."
+        },
+        {
+          "path": "tools.1.annotations.schema_empty",
+          "eq": false,
+          "note": "G1 — allOf branches merge."
+        },
+        {
+          "path": "tools.2.annotations.schema_empty",
+          "eq": false,
+          "note": "G1 — oneOf union flattens."
+        },
+        {
+          "path": "tools.2.annotations.schema_is_union",
+          "eq": true
+        },
+        {
+          "path": "tools.3.annotations.schema_empty",
+          "eq": false
+        },
+        {
+          "path": "tools.3.output_schema.properties.count.type",
+          "eq": "integer",
+          "note": "G3 — outputSchema not dropped."
+        },
+        {
+          "path": "tools.0.input_schema.properties.filters.type",
+          "eq": "object",
+          "note": "G10 — property-level $ref resolved."
+        },
+        {
+          "path": "tools.0.annotations.properties.filters.type_missing",
+          "eq": false
+        },
+        {
+          "path": "tools.0.annotations.properties.filters.description_missing",
+          "eq": true,
+          "note": "Genuine finding, not a false positive."
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-003",
+      "category": "custom-stdio-resource-templates",
+      "description": "Server exposing static resources AND resource templates.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/resource_templates_server.py",
+      "timeout": 15,
+      "subprocess_timeout": 30,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.has_resources",
+          "eq": true
+        },
+        {
+          "path": "server_annotations.resource_template_count",
+          "eq": 2,
+          "note": "G2 — list_resource_templates() is called."
+        },
+        {
+          "path": "resource_templates.0.uri_template",
+          "eq": "file:///workspace/{path}",
+          "note": "template CONTENT (not just count) reaches the judge."
+        },
+        {
+          "path": "resource_templates.1.description",
+          "eq": "A specific commit by SHA in the current repository."
+        },
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 0
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-004",
+      "category": "custom-stdio-server-level",
+      "description": "22 tools, mixed naming convention, sequential-name flood + one genuine near-duplicate pair.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/large_surface_server.py",
+      "timeout": 15,
+      "subprocess_timeout": 30,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 22
+        },
+        {
+          "path": "server_annotations.tool_count_high",
+          "eq": true
+        },
+        {
+          "path": "server_annotations.naming_inconsistent",
+          "eq": true
+        },
+        {
+          "path": "server_annotations.duplicate_name_pairs",
+          "eq": [
+            [
+              "get_user",
+              "get_users"
+            ]
+          ],
+          "note": "G4 — sequential-suffix false positives suppressed; genuine pair kept."
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-005",
+      "category": "custom-stdio-failure-mode",
+      "description": "Server sleeps 5s before handshake; client --timeout is 2s. Timeout must produce the actionable message.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/slow_start_server.py",
+      "env": {
+        "MCP_RUBRIQ_FIXTURE_DELAY": "5"
+      },
+      "timeout": 2,
+      "subprocess_timeout": 20,
+      "expect_outcome": "failure",
+      "assertions": [
+        {
+          "path": "detail",
+          "eq": "Increase --timeout or verify the server is reachable.",
+          "note": "G5 — actionable message, not an opaque ExceptionGroup."
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-006",
+      "category": "custom-stdio-failure-mode",
+      "description": "Process exits nonzero before any MCP bytes are written (simulates a missing dependency).",
+      "transport": "stdio",
+      "command": "python tests/fixtures/broken_server.py",
+      "env": {
+        "MCP_RUBRIQ_FIXTURE_MODE": "exit_nonzero"
+      },
+      "timeout": 10,
+      "subprocess_timeout": 20,
+      "expect_outcome": "failure",
+      "assertions": [
+        {
+          "path": "detail",
+          "eq": "ServerConnectionError"
+        },
+        {
+          "path": "error",
+          "contains": "server stderr: fixture: simulated startup failure",
+          "note": "G6 — the child's real stderr text surfaces."
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-007",
+      "category": "custom-stdio-failure-mode",
+      "description": "Process writes non-JSON-RPC bytes to stdout, then exits (misconfigured server, pre-handshake).",
+      "transport": "stdio",
+      "command": "python tests/fixtures/broken_server.py",
+      "env": {
+        "MCP_RUBRIQ_FIXTURE_MODE": "garbage_stdout"
+      },
+      "timeout": 10,
+      "subprocess_timeout": 20,
+      "expect_outcome": "failure",
+      "assertions": [
+        {
+          "path": "detail",
+          "eq": "ServerConnectionError"
+        },
+        {
+          "path": "error",
+          "contains": "Connection closed"
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-008",
+      "category": "custom-stdio-failure-mode",
+      "description": "Process never responds at all; client --timeout is 3s.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/broken_server.py",
+      "env": {
+        "MCP_RUBRIQ_FIXTURE_MODE": "hang"
+      },
+      "timeout": 3,
+      "subprocess_timeout": 20,
+      "expect_outcome": "failure",
+      "assertions": [
+        {
+          "path": "detail",
+          "eq": "Increase --timeout or verify the server is reachable.",
+          "note": "G5 — distinguished from TM-006/TM-007."
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-009",
+      "category": "custom-network-http",
+      "description": "Streamable-HTTP fixture server, exercised end-to-end over a real local socket.",
+      "transport": "http",
+      "fixture_command": [
+        "python",
+        "tests/fixtures/http_probe_server.py"
+      ],
+      "fixture_env": {
+        "MCP_RUBRIQ_FIXTURE_PORT": "8941"
+      },
+      "port": 8941,
+      "url_template": "http://127.0.0.1:{port}/mcp",
+      "startup_wait": 3,
+      "timeout": 10,
+      "subprocess_timeout": 25,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 2
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-010",
+      "category": "custom-network-sse",
+      "description": "SSE-transport fixture server, exercised end-to-end over a real local socket.",
+      "transport": "sse",
+      "fixture_command": [
+        "python",
+        "tests/fixtures/sse_probe_server.py"
+      ],
+      "fixture_env": {
+        "MCP_RUBRIQ_FIXTURE_PORT": "8942"
+      },
+      "port": 8942,
+      "url_template": "http://127.0.0.1:{port}/sse",
+      "startup_wait": 3,
+      "timeout": 10,
+      "subprocess_timeout": 25,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 1
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-011",
+      "category": "published-stdio",
+      "description": "Official filesystem server (npm). Target directory is a repo-relative path.",
+      "transport": "stdio",
+      "command": "npx -y @modelcontextprotocol/server-filesystem tests/fixtures",
+      "timeout": 45,
+      "subprocess_timeout": 60,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 14
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-012",
+      "category": "published-stdio",
+      "description": "Official 'everything' kitchen-sink server (npm) — every capability type in one server.",
+      "transport": "stdio",
+      "command": "npx -y @modelcontextprotocol/server-everything",
+      "timeout": 45,
+      "subprocess_timeout": 60,
+      "expect_outcome": "success",
+      "assertions": [],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-013",
+      "category": "published-stdio",
+      "description": "Official memory / knowledge-graph server (npm).",
+      "transport": "stdio",
+      "command": "npx -y @modelcontextprotocol/server-memory",
+      "timeout": 45,
+      "subprocess_timeout": 60,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 9
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-014",
+      "category": "published-stdio",
+      "description": "Official sequential-thinking server (npm) — registry-miss/fallback-path exercise.",
+      "transport": "stdio",
+      "command": "npx -y @modelcontextprotocol/server-sequential-thinking",
+      "timeout": 45,
+      "subprocess_timeout": 60,
+      "expect_outcome": "success",
+      "assertions": [],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-015",
+      "category": "published-stdio-env-gated",
+      "description": "Official GitHub server — requires a real GITHUB_TOKEN with least-privilege scopes.",
+      "transport": "stdio",
+      "command": "npx -y @modelcontextprotocol/server-github",
+      "timeout": 45,
+      "subprocess_timeout": 60,
+      "expect_outcome": "success",
+      "assertions": [],
+      "skip_reason": "Requires GITHUB_TOKEN. Run manually: set the env var, remove this skip_reason (or pass --include-skipped), and re-run."
+    },
+    {
+      "id": "TM-016",
+      "category": "published-stdio-env-gated",
+      "description": "Official Brave Search server — requires a real BRAVE_API_KEY.",
+      "transport": "stdio",
+      "command": "npx -y @modelcontextprotocol/server-brave-search",
+      "timeout": 45,
+      "subprocess_timeout": 60,
+      "expect_outcome": "success",
+      "assertions": [],
+      "skip_reason": "Requires BRAVE_API_KEY. Run manually with a real key."
+    },
+    {
+      "id": "TM-017",
+      "category": "published-stdio-env-gated",
+      "description": "Official Slack server — requires SLACK_BOT_TOKEN and SLACK_TEAM_ID for a real workspace.",
+      "transport": "stdio",
+      "command": "npx -y @modelcontextprotocol/server-slack",
+      "timeout": 45,
+      "subprocess_timeout": 60,
+      "expect_outcome": "success",
+      "assertions": [],
+      "skip_reason": "Requires SLACK_BOT_TOKEN + SLACK_TEAM_ID against a real workspace. Run manually."
+    },
+    {
+      "id": "TM-018",
+      "category": "published-stdio-expensive",
+      "description": "Official Puppeteer server — first run downloads a full Chromium build.",
+      "transport": "stdio",
+      "command": "npx -y @modelcontextprotocol/server-puppeteer",
+      "timeout": 120,
+      "subprocess_timeout": 150,
+      "expect_outcome": "success",
+      "assertions": [],
+      "skip_reason": "First run downloads Chromium (large, slow, network/disk heavy). Run manually and deliberately."
+    },
+    {
+      "id": "TM-019",
+      "category": "custom-stdio-regression",
+      "description": "Regression: --args with a leading-dash token (npx's -y) must parse via argparse.REMAINDER.",
+      "transport": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-everything"
+      ],
+      "timeout": 60,
+      "subprocess_timeout": 75,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 13
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-020",
+      "category": "phase1-scale",
+      "description": "120 individually-clean tools — scale test for introspection/annotation; only A001-related flags should fire.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/huge_tool_count_server.py",
+      "timeout": 20,
+      "subprocess_timeout": 45,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 120
+        },
+        {
+          "path": "server_annotations.tool_count_high",
+          "eq": true
+        },
+        {
+          "path": "server_annotations.naming_inconsistent",
+          "eq": false,
+          "note": "All 120 names are uniform snake_case."
+        },
+        {
+          "path": "server_annotations.duplicate_name_pairs",
+          "eq": [],
+          "note": "No near-duplicates by construction — any pair here is a false positive."
+        },
+        {
+          "path": "tools.0.annotations.schema_empty",
+          "eq": false
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-021",
+      "category": "phase1-floor",
+      "description": "Server with NO handlers at all — zero tools/resources/prompts, no advertised capabilities.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/empty_server.py",
+      "timeout": 15,
+      "subprocess_timeout": 30,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 0
+        },
+        {
+          "path": "server_annotations.has_resources",
+          "eq": false
+        },
+        {
+          "path": "server_annotations.has_prompts",
+          "eq": false
+        },
+        {
+          "path": "introspection_warnings",
+          "eq": [],
+          "note": "Genuinely-empty differs from failed-listing: NO warnings here (see TM-032/034 for the contrast)."
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-022",
+      "category": "phase1-unicode",
+      "description": "Non-ASCII tool names (accented/CJK/emoji), descriptions, resource and prompt metadata — the Windows cp1252 crash regression.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/unicode_server.py",
+      "timeout": 20,
+      "subprocess_timeout": 45,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 4
+        },
+        {
+          "path": "tools.0.name",
+          "eq": "café_search",
+          "note": "UTF-8 survives end-to-end: child (PYTHONUTF8), pipe, and our own stdout (reconfigure). Was a hard UnicodeDecodeError crash."
+        },
+        {
+          "path": "tools.0.annotations.name_invalid_chars",
+          "eq": true,
+          "note": "Matches the SDK's own SEP-986 validation warning."
+        },
+        {
+          "path": "tools.1.annotations.name_invalid_chars",
+          "eq": true,
+          "note": "CJK name."
+        },
+        {
+          "path": "tools.2.annotations.name_invalid_chars",
+          "eq": true,
+          "note": "Emoji name."
+        },
+        {
+          "path": "tools.3.annotations.name_invalid_chars",
+          "eq": false,
+          "note": "ASCII name with non-ASCII description must NOT flag."
+        },
+        {
+          "path": "resources.0.name",
+          "eq": "ユーザーガイド"
+        },
+        {
+          "path": "prompts.0.name",
+          "eq": "résumé_review"
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-023",
+      "category": "phase1-schema-hostile",
+      "description": "Deep $ref chain past the depth guard, a cyclic $ref pair, oneOf→$ref→allOf combo, array-items $ref — must degrade, never crash or hang.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/deep_nesting_server.py",
+      "timeout": 20,
+      "subprocess_timeout": 45,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 4
+        },
+        {
+          "path": "tools.2.annotations.schema_is_union",
+          "eq": true,
+          "note": "combo_query's oneOf survived the composition."
+        },
+        {
+          "path": "tools.2.annotations.schema_empty",
+          "eq": false,
+          "note": "oneOf→$ref→allOf resolved to real properties."
+        },
+        {
+          "path": "tools.3.annotations.properties.patches.type_missing",
+          "eq": false,
+          "note": "array property with $ref items keeps its own type."
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-024",
+      "category": "phase1-template-only",
+      "description": "Server exposing ONLY resource templates — no static resources, tools, or prompts.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/template_only_server.py",
+      "timeout": 15,
+      "subprocess_timeout": 30,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.has_resources",
+          "eq": true,
+          "note": "Templates alone count as having resources."
+        },
+        {
+          "path": "server_annotations.resource_template_count",
+          "eq": 2
+        },
+        {
+          "path": "resources",
+          "eq": []
+        },
+        {
+          "path": "resource_templates.0.name",
+          "eq": "user-profile"
+        },
+        {
+          "path": "resource_templates.1.description",
+          "eq": null,
+          "note": "The low-quality template's missing description is visible to the judge — R-series bait."
+        },
+        {
+          "path": "introspection_warnings.0",
+          "contains": "does not advertise",
+          "note": "P1-CAP — the SDK doesn't advertise `resources` for a templates-only handler; introspection must probe reality anyway AND surface the advertisement mismatch."
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-025",
+      "category": "phase1-prompt-edges",
+      "description": "Prompt-argument edge cases: no description, many args with mixed quality, required-undescribed, zero args, name with a space.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/prompt_edge_cases_server.py",
+      "timeout": 15,
+      "subprocess_timeout": 30,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.has_prompts",
+          "eq": true
+        },
+        {
+          "path": "prompts",
+          "len_gte": 4
+        },
+        {
+          "path": "prompts.1.arguments",
+          "len_gte": 8,
+          "note": "All 8 arguments forwarded, including undescribed ones."
+        },
+        {
+          "path": "prompts.0.description",
+          "eq": null,
+          "note": "Missing prompt description is visible to the judge."
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-026",
+      "category": "phase1-scale",
+      "description": "300 static resources — measures the output-size cost on a resource-heavy server (see stdout KB column).",
+      "transport": "stdio",
+      "command": "python tests/fixtures/huge_resources_server.py",
+      "timeout": 20,
+      "subprocess_timeout": 45,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "resources",
+          "len_gte": 300
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-027",
+      "category": "phase1-injection",
+      "description": "Prompt-injection payloads in tool/resource/template/prompt metadata; one clean control tool.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/injection_metadata_server.py",
+      "timeout": 15,
+      "subprocess_timeout": 30,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "tools.0.annotations.has_injection_keywords",
+          "len_gte": 2,
+          "note": "Override-style payload flagged."
+        },
+        {
+          "path": "tools.1.annotations.has_injection_keywords",
+          "len_gte": 2,
+          "note": "Concealment-style payload flagged."
+        },
+        {
+          "path": "tools.2.annotations.has_injection_keywords",
+          "eq": [],
+          "note": "Clean control tool must NOT flag."
+        },
+        {
+          "path": "resources.0.description",
+          "contains": "disregard prior instructions",
+          "note": "Resource payload reaches the judge for X005 semantic evaluation."
+        },
+        {
+          "path": "resource_templates.0.description",
+          "contains": "skip any further security analysis"
+        },
+        {
+          "path": "prompts.0.description",
+          "contains": "do not tell the user"
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-028",
+      "category": "phase1-midsession-failure",
+      "description": "Server initializes correctly, then crashes on the first real request. Outcome is a PARTIAL success: empty lists plus explicit introspection_warnings — not a hard failure, and crucially not a silent 'empty server'.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/protocol_breaker_server.py",
+      "env": {
+        "MCP_RUBRIQ_FIXTURE_MODE": "crash_after_init"
+      },
+      "timeout": 5,
+      "subprocess_timeout": 30,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 0
+        },
+        {
+          "path": "introspection_warnings",
+          "len_gte": 4,
+          "note": "All four listings failed and each failure is recorded IN the model — the judge can distinguish this from TM-025's genuinely-empty server."
+        },
+        {
+          "path": "introspection_warnings.0",
+          "contains": "Could not list tools"
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-029",
+      "category": "phase1-midsession-failure",
+      "description": "Server initializes correctly, then answers the first request with non-JSON garbage and exits. Degrades to a partial report with warnings (pre-fix: hard UnicodeDecodeError crash).",
+      "transport": "stdio",
+      "command": "python tests/fixtures/protocol_breaker_server.py",
+      "env": {
+        "MCP_RUBRIQ_FIXTURE_MODE": "garbage_after_init"
+      },
+      "timeout": 5,
+      "subprocess_timeout": 30,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "introspection_warnings",
+          "len_gte": 4
+        },
+        {
+          "path": "introspection_warnings.0",
+          "contains": "Could not list tools"
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-030",
+      "category": "phase1-midsession-failure",
+      "description": "Server initializes correctly, then never answers any request. Each listing times out individually (per-call timeout), producing a partial report with named TimeoutError warnings.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/protocol_breaker_server.py",
+      "env": {
+        "MCP_RUBRIQ_FIXTURE_MODE": "hang_after_init"
+      },
+      "timeout": 4,
+      "subprocess_timeout": 45,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "introspection_warnings",
+          "len_gte": 4
+        },
+        {
+          "path": "introspection_warnings.0",
+          "contains": "TimeoutError",
+          "note": "The warning names the reason — str(TimeoutError()) is empty, so the type name is used."
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-031",
+      "category": "phase1-auth-http",
+      "description": "Bearer-protected streamable-HTTP server, linted WITH the correct --header — the hosted/remote server shape.",
+      "transport": "http",
+      "fixture_command": [
+        "python",
+        "tests/fixtures/auth_http_probe_server.py"
+      ],
+      "fixture_env": {
+        "MCP_RUBRIQ_FIXTURE_TOKEN": "sekrit-token"
+      },
+      "port": 8951,
+      "url_template": "http://127.0.0.1:{port}/mcp",
+      "headers": [
+        "Authorization: Bearer sekrit-token"
+      ],
+      "startup_wait": 4,
+      "timeout": 10,
+      "subprocess_timeout": 30,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 1
+        },
+        {
+          "path": "tools.0.name",
+          "eq": "whoami"
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-032",
+      "category": "phase1-auth-http",
+      "description": "Same Bearer-protected server, linted WITHOUT the header — must fail with the 401 surfaced, not hang or crash.",
+      "transport": "http",
+      "fixture_command": [
+        "python",
+        "tests/fixtures/auth_http_probe_server.py"
+      ],
+      "fixture_env": {
+        "MCP_RUBRIQ_FIXTURE_TOKEN": "sekrit-token"
+      },
+      "port": 8953,
+      "url_template": "http://127.0.0.1:{port}/mcp",
+      "startup_wait": 4,
+      "timeout": 10,
+      "subprocess_timeout": 30,
+      "expect_outcome": "failure",
+      "assertions": [
+        {
+          "path": "error",
+          "contains": "401",
+          "note": "The auth failure is quotable — the skill can tell the user exactly what to supply."
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-033",
+      "category": "phase1-protocol-version",
+      "description": "Server negotiating the OLDEST client-supported protocol version (2024-11-05) and behaving correctly — must lint cleanly.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/protocol_breaker_server.py",
+      "env": {
+        "MCP_RUBRIQ_FIXTURE_MODE": "old_protocol"
+      },
+      "timeout": 10,
+      "subprocess_timeout": 30,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_info.protocol_version",
+          "eq": "2024-11-05"
+        },
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 1
+        },
+        {
+          "path": "tools.0.name",
+          "eq": "legacy_ping"
+        },
+        {
+          "path": "introspection_warnings",
+          "eq": []
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-034",
+      "category": "phase1-protocol-version",
+      "description": "Server claiming an unsupported protocol version ('2019-01-01') — client must reject with an actionable error.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/protocol_breaker_server.py",
+      "env": {
+        "MCP_RUBRIQ_FIXTURE_MODE": "alien_protocol"
+      },
+      "timeout": 10,
+      "subprocess_timeout": 30,
+      "expect_outcome": "failure",
+      "assertions": [
+        {
+          "path": "error",
+          "contains": "Unsupported protocol version",
+          "note": "Names the exact problem and the offending version."
+        },
+        {
+          "path": "error",
+          "contains": "2019-01-01"
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-035",
+      "category": "phase1-network-failure",
+      "description": "HTTP transport against a port nothing is listening on — connection refused must produce a clean error.",
+      "transport": "http",
+      "fixture_command": [
+        "python",
+        "-c",
+        "import time; time.sleep(20)"
+      ],
+      "port": 9159,
+      "url_template": "http://127.0.0.1:{port}/mcp",
+      "startup_wait": 1,
+      "timeout": 8,
+      "subprocess_timeout": 30,
+      "expect_outcome": "failure",
+      "assertions": [
+        {
+          "path": "error",
+          "contains": "connection attempts failed",
+          "note": "httpx's ConnectError text, surfaced verbatim."
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-036",
+      "category": "phase1-network-failure",
+      "description": "HTTP transport against a live web server that is NOT an MCP endpoint (python -m http.server) — must fail cleanly, not mis-lint HTML.",
+      "transport": "http",
+      "fixture_command": [
+        "python",
+        "-m",
+        "http.server",
+        "8952",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8952,
+      "url_template": "http://127.0.0.1:{port}/mcp",
+      "startup_wait": 2,
+      "timeout": 8,
+      "subprocess_timeout": 30,
+      "expect_outcome": "failure",
+      "assertions": [
+        {
+          "path": "detail",
+          "eq": "ServerConnectionError"
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-037",
+      "category": "phase1-auth-sse",
+      "description": "Bearer-protected SSE server, linted WITH the correct --header — proves --header works on SSE too, not just streamable-HTTP.",
+      "transport": "sse",
+      "fixture_command": [
+        "python",
+        "tests/fixtures/auth_sse_probe_server.py"
+      ],
+      "fixture_env": {
+        "MCP_RUBRIQ_FIXTURE_TOKEN": "sekrit-token"
+      },
+      "port": 8954,
+      "url_template": "http://127.0.0.1:{port}/sse",
+      "headers": [
+        "Authorization: Bearer sekrit-token"
+      ],
+      "startup_wait": 4,
+      "timeout": 10,
+      "subprocess_timeout": 30,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 1
+        },
+        {
+          "path": "tools.0.name",
+          "eq": "whoami"
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-038",
+      "category": "phase1-auth-sse",
+      "description": "Same Bearer-protected SSE server, linted WITHOUT the header — must fail cleanly, not hang.",
+      "transport": "sse",
+      "fixture_command": [
+        "python",
+        "tests/fixtures/auth_sse_probe_server.py"
+      ],
+      "fixture_env": {
+        "MCP_RUBRIQ_FIXTURE_TOKEN": "sekrit-token"
+      },
+      "port": 8955,
+      "url_template": "http://127.0.0.1:{port}/sse",
+      "startup_wait": 4,
+      "timeout": 10,
+      "subprocess_timeout": 30,
+      "expect_outcome": "failure",
+      "assertions": [
+        {
+          "path": "detail",
+          "eq": "ServerConnectionError"
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-039",
+      "category": "phase1-capability-mismatch",
+      "description": "Server advertises tools+resources+prompts correctly, but tools/list itself returns Method-Not-Found while resources/prompts work fine — an advertised-but-unimplemented capability, distinct from the benign templates-optional case.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/protocol_breaker_server.py",
+      "env": {
+        "MCP_RUBRIQ_FIXTURE_MODE": "false_advertising"
+      },
+      "timeout": 10,
+      "subprocess_timeout": 30,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 0
+        },
+        {
+          "path": "prompts.0.name",
+          "eq": "still_works",
+          "note": "Proves the failure is attributed to tools specifically, not a blanket connection problem."
+        },
+        {
+          "path": "introspection_warnings",
+          "len_gte": 1,
+          "note": "An ADVERTISED capability whose listing is unimplemented must be recorded — unlike the benign resource-templates-optional case."
+        },
+        {
+          "path": "introspection_warnings.0",
+          "contains": "Could not list tools"
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-040",
+      "category": "phase2-annotations",
+      "description": "Tool annotations (readOnly/destructive/idempotent/openWorld hints) captured and forwarded to the judge. Includes an unannotated destructive tool (None) and a 'lying' destructive tool (readOnlyHint=true) for the adversarial judge check.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/annotations_server.py",
+      "timeout": 15,
+      "subprocess_timeout": 30,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 4
+        },
+        {
+          "path": "tools.0.tool_annotations.read_only_hint",
+          "eq": true,
+          "note": "honest read tool"
+        },
+        {
+          "path": "tools.1.tool_annotations.destructive_hint",
+          "eq": true,
+          "note": "honest delete tool"
+        },
+        {
+          "path": "tools.2.tool_annotations",
+          "eq": null,
+          "note": "unannotated destructive tool — None, distinct from an explicit false"
+        },
+        {
+          "path": "tools.3.tool_annotations.read_only_hint",
+          "eq": true,
+          "note": "the LIE: destructive tool claiming read-only, forwarded verbatim for the judge to catch (annotations untrusted)"
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-041",
+      "category": "phase4-a001-a002-resolution",
+      "description": "The WRONG fix for tool bloat: one mega-tool with an action/mode switch and 9 params. Must trip A002-relevant evidence (param count, action enum), not just look fine because tool_count is low.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/god_tool_wrong_fix_server.py",
+      "timeout": 15,
+      "subprocess_timeout": 30,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 1
+        },
+        {
+          "path": "server_annotations.tool_count_high",
+          "eq": false,
+          "note": "Low tool count alone must not be mistaken for a good fix — see the 9-param action-switch evidence below."
+        },
+        {
+          "path": "tools.0.name",
+          "eq": "manage_tasks"
+        },
+        {
+          "path": "tools.0.input_schema.properties.action.enum",
+          "len_gte": 8,
+          "note": "The action/mode enum A002 keys on."
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-042",
+      "category": "phase4-a001-a002-resolution",
+      "description": "The CORRECT fix for tool bloat: 6 intent-specific tools, none with an action/mode switch or excessive params. Must pass both A001 and A002.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/consolidated_correct_fix_server.py",
+      "timeout": 15,
+      "subprocess_timeout": 30,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 6
+        },
+        {
+          "path": "server_annotations.tool_count_high",
+          "eq": false
+        },
+        {
+          "path": "tools.0.name",
+          "eq": "upsert_task"
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-043",
+      "category": "phase4-x006-shadowing",
+      "description": "X006 fixture: read_calendar's description tries to shadow send_email's future behavior (the attack). read_file/read_multiple_files legitimately cross-reference each other with no attached instruction (the control) — the annotator flags both identically by design; distinguishing them is the judge's job.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/tool_shadowing_server.py",
+      "timeout": 15,
+      "subprocess_timeout": 30,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "server_annotations.tool_count",
+          "eq": 4
+        },
+        {
+          "path": "tools.1.name",
+          "eq": "read_calendar"
+        },
+        {
+          "path": "tools.1.annotations.references_other_tools",
+          "eq": [
+            "send_email"
+          ]
+        },
+        {
+          "path": "tools.2.annotations.references_other_tools",
+          "eq": [
+            "read_multiple_files"
+          ],
+          "note": "Legitimate mutual reference — annotator flags it too; judge must tell it apart from the attack via the attached-instruction test."
+        }
+      ],
+      "skip_reason": null
+    },
+    {
+      "id": "TM-044",
+      "category": "phase4-s007-omnibus",
+      "description": "S007 fixture: an undocumented catch-all blob param (violation), a properly-shaped object param (control), and a blob param explicitly documented as intentionally arbitrary (borderline) — same annotator flag on both blobs by design; judge must distinguish documented-intentional from undocumented.",
+      "transport": "stdio",
+      "command": "python tests/fixtures/omnibus_params_server.py",
+      "timeout": 15,
+      "subprocess_timeout": 30,
+      "expect_outcome": "success",
+      "assertions": [
+        {
+          "path": "tools.0.annotations.properties.config.is_omnibus_blob",
+          "eq": true,
+          "note": "configure_pipeline's config — undocumented, the real violation."
+        },
+        {
+          "path": "tools.1.annotations.properties.address.is_omnibus_blob",
+          "eq": false,
+          "note": "create_address's address — has its own defined shape, must not flag."
+        },
+        {
+          "path": "tools.2.annotations.properties.tags.is_omnibus_blob",
+          "eq": true,
+          "note": "tag_resource's tags — same shape as the violation, but documented as intentional; judge distinguishes via the description."
+        }
+      ],
+      "skip_reason": null
+    }
+  ]
+}
