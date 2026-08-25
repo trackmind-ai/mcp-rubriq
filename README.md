@@ -246,12 +246,15 @@ rule is drawn in the wrong place" is the highest-value signal there is.
 
 ## Roadmap
 
-MCP-Rubriq is pre-1.0 while its contribution pipelines (see `CONTRIBUTING.md`'s three lanes) are
-still proving out against real external PRs. The deliberately-deferred rule ideas and
-architectural boundaries — what's a good first issue vs. what's a different tool entirely — are
-tracked in [`docs/boundaries.md`](docs/boundaries.md), which doubles as the public roadmap.
-Promotion to `1.0.0` happens once a handful of external contributions have landed
-friction-free through the existing lanes, not on a fixed date.
+MCP-Rubriq is public and looking for contributors. [`ROADMAP.md`](ROADMAP.md) lists what's
+planned, organized by how soon it's realistic — the fastest way in is a
+[good first issue](https://github.com/trackmind-ai/mcp-rubriq/labels/good%20first%20issue) or one
+of the rule-content gaps it points at. [`docs/boundaries.md`](docs/boundaries.md) has the
+reasoning behind each one.
+
+The version is `0.1.0` because the rulebook and judge are still actively growing. `1.0.0` lands
+once that growth settles into a stable baseline — see `CONTRIBUTING.md`'s three lanes for how
+changes get reviewed on the way there.
 
 ## License
 

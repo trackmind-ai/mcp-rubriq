@@ -83,6 +83,6 @@ and cannot promise:
 
 ## Supported Versions
 
-MCP-Rubriq is pre-1.0 while its contribution pipelines are still proving out (see the roadmap in
-`README.md`). Security fixes land on the latest released version; there is no long-term-support
-branch yet. This section will be updated once a 1.0 release establishes a stable baseline.
+MCP-Rubriq is public and pre-1.0 (`0.1.0`) — see the roadmap in `README.md`. Security fixes land
+on the latest released version; there is no long-term-support branch yet. This section will be
+updated once a 1.0 release establishes a stable baseline.

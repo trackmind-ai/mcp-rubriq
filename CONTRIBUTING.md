@@ -94,24 +94,29 @@ fixture proving the change fixes what you think it fixes without reopening a pre
 false positive — check `docs/testing.md`'s "known environment quirks" and existing fixture
 suite for prior art before assuming a pattern hasn't been hit before.
 
-### Lane C — `SKILL.md` (the judge's own instructions) — maintainer-only
+### Lane C — the judge's own instructions — maintainer-reviewed
 
-`SKILL.md` *is* the judge: it defines how targets are resolved, how the pipeline is invoked,
-and how the judge is supposed to reason about the rubric and resist manipulation. A regression
-here can silently break hijack-resistance or a resolution guardrail. Changes here are
-maintainer-only, and before merging anything non-trivial, **run the manual adversarial check**
-described in `docs/testing.md` Layer 3 — specifically, confirm the judge still resists
-`tests/fixtures/injection_metadata_server.py`'s five embedded hijack attempts. This is currently
-a manual step, not a CI gate (see `SECURITY.md` for why) — treat it as a required part of
-review, not optional.
+`SKILL.md` *is* the judge for Claude Code: it defines how targets are resolved, how the pipeline
+is invoked, and how the judge is supposed to reason about the rubric and resist manipulation. A
+regression here can silently break hijack-resistance or a resolution guardrail.
 
-### The open lane — fixtures, docs, false-positive reports
+We're not actively building support for other runtimes ourselves (see `ROADMAP.md`), but an
+equivalent instruction file for a different agent CLI carries the same responsibility and falls
+in this lane if someone wants to contribute one. Before merging anything non-trivial, **run the
+manual adversarial check** described in `docs/testing.md` Layer 3 — using the actual target
+client — confirming the judge still resists `tests/fixtures/injection_metadata_server.py`'s five
+embedded hijack attempts. This is currently a manual step, not a CI gate (see `SECURITY.md` for
+why), and it happens at review time, same as any other `SKILL.md` change.
+
+### The open lane — fixtures, docs, dev tooling, false-positive reports
 
 Not everything needs the scrutiny above. **New fixtures**, the good-first-issue rule gaps in
-`docs/boundaries.md` §A, documentation improvements, and **false-positive reports** are a fast
-path: any maintainer can review and merge, normal CI + automated review is enough. False
-positives especially — for a tool whose product *is* a rubric, "this rule is drawn in the wrong
-place" is the highest-value signal there is, so if a rule fired
+`docs/boundaries.md` §A, documentation improvements, **dev tooling** (`Makefile`, `tasks.ps1`,
+`scripts/install.sh` / `install.ps1`), and **false-positive reports** are a fast path: any
+maintainer can review and merge, normal CI + automated review is enough. None of these touch the
+rubric, the pipeline's contract, or the judge, so there's no trust boundary to protect — just
+ordinary code review. False positives especially — for a tool whose product *is* a rubric, "this
+rule is drawn in the wrong place" is the highest-value signal there is, so if a rule fired
 somewhere it shouldn't have, please report it (even without a fix in hand) rather than staying
 quiet about it.
 

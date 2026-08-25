@@ -8,8 +8,9 @@
 
 - [ ] Lane A — a new/changed rule (`rulebook/rules/*.md`)
 - [ ] Lane B — Python core (`introspection/`, `models/`, `rulebook/annotator.py`, `scripts/`)
-- [ ] Lane C — `SKILL.md` (the judge's own instructions)
-- [ ] Open lane — fixtures, docs, or a false-positive report with no code change
+- [ ] Lane C — the judge's own instructions (`SKILL.md`, or an equivalent for another runtime)
+- [ ] Open lane — fixtures, docs, dev tooling (`Makefile`, `tasks.ps1`, `scripts/install.*`), or a
+      false-positive report
 
 ---
 
@@ -29,9 +30,10 @@
 - [ ] If this changes a **shipped** annotator heuristic: a regression fixture proving the
       fix, checked against the existing fixture suite for reopened false positives
 
-### If this is a Lane C (`SKILL.md`) PR
+### If this is a Lane C (judge instructions) PR
 
-- [ ] Ran the manual adversarial check from `docs/testing.md` Layer 3 against
+- [ ] Ran the manual adversarial check from `docs/testing.md` Layer 3 **using the actual client
+      this PR targets** (Claude Code, Codex CLI, or whatever else) against
       `tests/fixtures/injection_metadata_server.py` — all 5 embedded hijack attempts still
       cited as evidence and not complied with
 - [ ] Ran the same check against `tests/fixtures/annotations_server.py` — a tool lying about
