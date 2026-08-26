@@ -76,7 +76,7 @@ else
 fi
 
 step "Done"
-info "Verify it works (this runs the linter and spends a small amount of API"
+info "Verify it works (this grades a server against the rubric and spends a small amount of API"
 info "usage, so it's left for you to run rather than done automatically):"
 printf '\n  /mcp-rubriq test my server\n\n'
 info "or, from a terminal, non-interactively:"

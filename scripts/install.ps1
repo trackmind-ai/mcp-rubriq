@@ -77,7 +77,7 @@ try {
 }
 
 Step "Done"
-Info "Verify it works (this runs the linter and spends a small amount of API"
+Info "Verify it works (this grades a server against the rubric and spends a small amount of API"
 Info "usage, so it's left for you to run rather than done automatically):"
 Write-Host "`n  /mcp-rubriq test my server`n"
 Info "or, from a terminal, non-interactively:"
