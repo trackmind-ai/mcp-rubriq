@@ -566,3 +566,36 @@ def test_union_schema_flag_propagates():
     # A union's empty required array is structural, not a quality issue —
     # but the annotator still reports the raw fact; the judge contextualizes.
     assert ann.required_array_empty is True
+
+
+# ---------------------------------------------------------------------------
+# Regression — JSON Schema "type" may be a list (crashed with a ValidationError)
+# ---------------------------------------------------------------------------
+
+
+def _annotate_props(props: dict):
+    tool = ToolModel(
+        name="t",
+        description="Does a thing with enough words to not be short.",
+        input_schema=ToolInputSchema.model_validate({"type": "object", "properties": props}),
+    )
+    return annotate(_server(tools=[tool])).tools[0].annotations.properties
+
+
+def test_list_type_union_is_typed_and_not_a_blob():
+    ann = _annotate_props({"flag": {"type": ["boolean", "string"], "description": "x"}})["flag"]
+    assert ann.type_missing is False
+    assert ann.is_omnibus_blob is False
+
+
+def test_nullable_integer_still_gets_bounds_check():
+    ann = _annotate_props({"limit": {"type": ["integer", "null"]}})["limit"]
+    assert ann.type_missing is False
+    assert ann.needs_bounds is True
+
+
+def test_nullable_bare_object_is_still_an_omnibus_blob():
+    ann = _annotate_props(
+        {"payload": {"type": ["object", "null"], "extra": {"additionalProperties": True}}}
+    )["payload"]
+    assert ann.is_omnibus_blob is True

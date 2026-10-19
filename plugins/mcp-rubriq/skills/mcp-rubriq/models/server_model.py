@@ -25,7 +25,8 @@ from pydantic import BaseModel, Field
 class ToolInputProperty(BaseModel):
     """A single property inside a tool's input schema."""
 
-    type: str | None = None
+    # JSON Schema allows a list of types (e.g. ["string", "null"], ["boolean", "string"]).
+    type: str | list[str] | None = None
     description: str | None = None
     enum: list[Any] | None = None
     # Preserve any extra schema fields we don't explicitly model
@@ -46,7 +47,7 @@ class ToolInputSchema(BaseModel):
     list, if any.
     """
 
-    type: str = "object"
+    type: str | list[str] = "object"
     properties: dict[str, ToolInputProperty] = Field(default_factory=dict)
     required: list[str] = Field(default_factory=list)
     is_union: bool = False

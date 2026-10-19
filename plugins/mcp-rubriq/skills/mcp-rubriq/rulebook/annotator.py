@@ -454,7 +454,18 @@ class Annotator:
 
         # Properties
         for prop_name, prop_obj in properties.items():
-            p_type = prop_obj.type
+            raw_type = prop_obj.type
+            # "type" may be a list (["integer", "null"]); "null" is not a shape.
+            p_types = (
+                [raw_type]
+                if isinstance(raw_type, str)
+                else [t for t in raw_type or [] if t != "null"]
+            )
+            p_type = (
+                raw_type
+                if isinstance(raw_type, str) or raw_type is None
+                else (p_types[0] if len(p_types) == 1 else "union")
+            )
             p_desc = prop_obj.description or ""
             p_desc_strip = p_desc.strip()
             p_combined = prop_name.lower() + " " + p_desc_strip.lower()
