@@ -4,6 +4,19 @@ All notable changes to this project are documented in this file. The format foll
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.1.1] — 2026-10-19
+
+Directory-submission readiness.
+
+### Added
+- `plugins/mcp-rubriq/README.md` with a full disclosure of what the plugin runs, sends and fetches.
+
+### Fixed
+- A JSON Schema `type` given as a list (for example `["boolean", "string"]` or `["integer", "null"]`) crashed the whole run with a pydantic `ValidationError`. The official `@modelcontextprotocol/server-sequential-thinking` server hit this. The model now accepts the list form, and the annotator treats `["integer", "null"]` as an integer (bounds check) and a multi-type union as typed rather than missing.
+
+### Changed
+- Runtime dependencies are pinned to exact versions in both `scripts/lint.py` (PEP 723 block, with `exclude-newer`) and `introspection/requirements.txt`.
+
 ## [0.1.0] — 2026-08-13
 
 Initial public release.

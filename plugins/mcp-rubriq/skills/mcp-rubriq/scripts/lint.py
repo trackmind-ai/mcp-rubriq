@@ -4,12 +4,14 @@
 # /// script
 # requires-python = ">=3.10"
 # dependencies = [
-#     "mcp>=1.0.0,<2.0.0",
-#     "pydantic>=2.0.0,<3.0.0",
-#     "anyio>=4.0.0,<5.0.0",
-#     "httpx>=0.27.0",
-#     "exceptiongroup>=1.0.0; python_version<'3.11'",
+#     "mcp==1.30.0",
+#     "pydantic==2.14.1",
+#     "anyio==4.15.1",
+#     "httpx==0.28.1",
+#     "exceptiongroup==1.3.1; python_version<'3.11'",
 # ]
+# [tool.uv]
+# exclude-newer = "2026-10-19T00:00:00Z"
 # ///
 
 """

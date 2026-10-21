@@ -1,7 +1,7 @@
 {
   "name": "mcp-rubriq",
   "description": "Grades MCP (Model Context Protocol) servers against a published 28-rule quality rubric. Connects to any MCP server and grades its tools, resources, and prompts using a structural annotator plus an LLM judge.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "author": { "name": "Trackmind", "email": "oss@trackmind.com" },
   "homepage": "https://github.com/trackmind-ai/mcp-rubriq",

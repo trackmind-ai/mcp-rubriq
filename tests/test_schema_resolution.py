@@ -335,3 +335,18 @@ class TestMapToolAnnotations:
     def test_non_dict_non_model_returns_none(self):
         """Defensive: a malformed annotations value must not crash the map."""
         assert _map_tool_annotations("garbage") is None
+
+
+class TestListTypes:
+    """JSON Schema allows "type" to be a list. The official sequential-thinking
+    server uses ["boolean", "string"]; the model used to reject it and crash the
+    whole lint run with a pydantic ValidationError."""
+
+    def test_list_type_property_accepted(self):
+        built = _build_input_schema(
+            {"type": "object", "properties": {"flag": {"type": ["boolean", "string"]}}}
+        )
+        assert built.properties["flag"].type == ["boolean", "string"]
+
+    def test_list_type_top_level_accepted(self):
+        assert _build_input_schema({"type": ["object", "null"]}).type == ["object", "null"]
