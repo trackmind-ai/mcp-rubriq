@@ -1,66 +1,67 @@
 {
-  "_comment": "Deterministic launch registry for common published MCP servers. Capped at ~10 entries by design (see roadmap Review Notes) — this is not meant to be an exhaustive package index. Anything not listed here falls back to model knowledge, flagged as unverified.",
+  "_comment": "Deterministic launch registry for common published MCP servers. Every launcher is pinned to an exact version (npx pkg@x.y.z, uvx pkg==x.y.z) so the plugin never runs whatever happens to be latest; re-check the pins when you touch this file (tests/test_known_servers.py enforces that they stay exact). github, brave-search, puppeteer and slack are deprecated on npm (no longer supported) and sqlite is archived; they are kept because people still ask for them. Capped at ~10 entries by design (see roadmap Review Notes) — this is not meant to be an exhaustive package index. Anything not listed here falls back to model knowledge, flagged as unverified.",
   "filesystem": {
     "transport": "stdio",
     "command": "npx",
-    "args": ["-y", "@modelcontextprotocol/server-filesystem"],
-    "env": []
+    "args": ["-y", "@modelcontextprotocol/server-filesystem@2.0.0", "<path>"],
+    "env": [],
+    "_note": "Needs at least one allowed directory: launched with none it advertises 0 tools (14 with one), which would grade as an empty server. Substitute <path> with a directory to expose, e.g. the project folder."
   },
   "fetch": {
     "transport": "stdio",
     "command": "uvx",
-    "args": ["mcp-server-fetch"],
+    "args": ["mcp-server-fetch==2026.10.19"],
     "env": [],
     "_note": "Not an npm package — @modelcontextprotocol/server-fetch 404s. Distributed as a Python package, launched via uvx."
   },
   "everything": {
     "transport": "stdio",
     "command": "npx",
-    "args": ["-y", "@modelcontextprotocol/server-everything"],
+    "args": ["-y", "@modelcontextprotocol/server-everything@2.0.0"],
     "env": []
   },
   "git": {
     "transport": "stdio",
     "command": "uvx",
-    "args": ["mcp-server-git", "--repository", "<path>"],
+    "args": ["mcp-server-git==2026.10.19", "--repository", "<path>"],
     "env": [],
     "_note": "Not an npm package — @modelcontextprotocol/server-git 404s. Distributed as a Python package, launched via uvx. --repository is required; substitute <path> with the target repo."
   },
   "memory": {
     "transport": "stdio",
     "command": "npx",
-    "args": ["-y", "@modelcontextprotocol/server-memory"],
+    "args": ["-y", "@modelcontextprotocol/server-memory@2.0.0"],
     "env": []
   },
   "sqlite": {
     "transport": "stdio",
     "command": "uvx",
-    "args": ["mcp-server-sqlite", "--db-path", "<path>"],
+    "args": ["mcp-server-sqlite==2025.4.25", "--db-path", "<path>"],
     "env": [],
     "_note": "Not an npm package — @modelcontextprotocol/server-sqlite 404s (archived from the npm scope). Distributed as a Python package, launched via uvx. --db-path is required; substitute <path> with the target database file."
   },
   "github": {
     "transport": "stdio",
     "command": "npx",
-    "args": ["-y", "@modelcontextprotocol/server-github"],
+    "args": ["-y", "@modelcontextprotocol/server-github@2025.4.8"],
     "env": ["GITHUB_TOKEN"]
   },
   "brave-search": {
     "transport": "stdio",
     "command": "npx",
-    "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+    "args": ["-y", "@modelcontextprotocol/server-brave-search@0.6.2"],
     "env": ["BRAVE_API_KEY"]
   },
   "puppeteer": {
     "transport": "stdio",
     "command": "npx",
-    "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
+    "args": ["-y", "@modelcontextprotocol/server-puppeteer@2025.5.12"],
     "env": []
   },
   "slack": {
     "transport": "stdio",
     "command": "npx",
-    "args": ["-y", "@modelcontextprotocol/server-slack"],
+    "args": ["-y", "@modelcontextprotocol/server-slack@2025.4.25"],
     "env": ["SLACK_BOT_TOKEN", "SLACK_TEAM_ID"]
   }
 }

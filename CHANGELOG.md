@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file. The format foll
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.1.2] — 2026-10-21
+
+### Changed
+- Every launcher in `known_servers.json` is pinned to an exact version (`npx pkg@x.y.z`, `uvx pkg==x.y.z`) instead of running whatever is latest, and `tests/test_known_servers.py` keeps it that way. github, brave-search, puppeteer and slack are deprecated on npm and sqlite is archived; they stay listed and the file now says so.
+
+### Fixed
+- The `filesystem` registry entry launched the server with no allowed directory, so it advertised 0 tools (14 with one) and graded as an empty server. It now carries a `<path>` placeholder with a note, and the skill substitutes `<path>` before running.
+
 ## [0.1.1] — 2026-10-19
 
 Directory-submission readiness.
