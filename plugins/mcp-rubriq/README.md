@@ -51,8 +51,8 @@ connect to it:
   command on your machine** with your permissions. `npx -y <package>` downloads and runs
   that package from npm. Only point it at servers you are willing to run.
 - For a published server named in `skills/mcp-rubriq/introspection/known_servers.json`
-  (11 entries), it uses the launch command recorded there, which is typically `npx -y` or
-  `uvx` with the official package. If a name is not in that list, Claude may suggest a
+  (11 entries), it uses the launch command recorded there, which is `npx -y` or
+  `uvx` with the official package pinned to an exact version. If a name is not in that list, Claude may suggest a
   command from its own knowledge and tells you it is unverified before running it.
 - For an HTTP or SSE URL, it connects to that URL and sends the request headers you
   supply (for example `Authorization`).

@@ -1,7 +1,7 @@
 [project]
 name = "mcp-rubriq"
 description = "Grades MCP (Model Context Protocol) servers against a published 28-rule quality rubric."
-version = "0.1.1"  # keep in sync with plugins/mcp-rubriq/.claude-plugin/plugin.json
+version = "0.1.2"  # keep in sync with plugins/mcp-rubriq/.claude-plugin/plugin.json
 requires-python = ">=3.10"  # inherited floor: the `mcp` package itself requires >=3.10
 dependencies = []  # the plugin's own runtime deps are declared where it ships from —
                     # see plugins/mcp-rubriq/skills/mcp-rubriq/introspection/requirements.txt
