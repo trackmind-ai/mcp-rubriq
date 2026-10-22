@@ -76,6 +76,32 @@ for grading. The plugin sends nothing to Trackmind or any other service.
 
 **Files it writes.** None in your project unless you ask it to save the report.
 
+## Try it
+
+Three prompts to start with:
+
+1. `/mcp-rubriq test my server`. Finds the MCP server project in your current folder, launches
+   it, and grades it.
+2. `/mcp-rubriq http://localhost:8000/mcp`. Grades a server that is already running.
+3. `/mcp-rubriq filesystem`. Grades a well-known published server by name. Claude asks which
+   directory to give it.
+
+Each run ends with a report: severity per finding, the evidence from the server's own
+metadata, a fix, and the rules that passed or did not apply.
+
+## Troubleshooting
+
+- **The run times out.** A cold `npx` or `uvx` start can take longer than the default 30
+  seconds. Ask Claude to re-run with a longer `--timeout`.
+- **`401 Unauthorized` from a hosted server.** The server needs credentials. Ask Claude to
+  re-run with an `Authorization` header. Export the token in your shell and have Claude
+  reference it by name so the token stays out of the conversation.
+- **A server needs environment variables.** Claude asks for them and never invents values.
+  Pass only the ones that server documents.
+- **The interpreter is blocked or packages are missing.** On machines with application
+  control, a launcher can be blocked. Claude falls back to a Python interpreter that already
+  has the packages, or stops and reports the exact error.
+
 ## Requirements
 
 Claude Code, plus `uv` (or Python 3.10+ with `pip`). Node.js only if the server you test is

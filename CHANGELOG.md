@@ -4,6 +4,11 @@ All notable changes to this project are documented in this file. The format foll
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+- Plugin README: added three example prompts and a troubleshooting section.
+
 ## [0.1.2] — 2026-10-21
 
 ### Changed
