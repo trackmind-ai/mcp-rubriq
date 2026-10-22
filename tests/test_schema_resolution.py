@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 Trackmind
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 """
 tests/test_schema_resolution.py

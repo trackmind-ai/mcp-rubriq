@@ -1,7 +1,7 @@
 # MCP-Rubriq
 
 [![CI](https://github.com/trackmind-ai/mcp-rubriq/actions/workflows/ci.yml/badge.svg)](https://github.com/trackmind-ai/mcp-rubriq/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-plugin-5A45FF)](https://code.claude.com/docs/en/plugins)
 [![Reviewed by CodeRabbit](https://img.shields.io/coderabbit/prs/github/trackmind-ai/mcp-rubriq?utm_source=oss&utm_medium=github&utm_campaign=trackmind-ai%2Fmcp-rubriq&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)](https://coderabbit.ai)
 
@@ -258,7 +258,12 @@ changes get reviewed on the way there.
 
 ## License
 
-MIT — see [`LICENSE`](LICENSE).
+GNU General Public License, version 3 or later (GPL-3.0-or-later) — see [`LICENSE`](LICENSE).
+
+Versions up to and including 0.1.2 were released under the MIT License, and those releases
+stay available under it. A small earlier contribution to the installer scripts was made under
+the MIT License and is kept with its original notice. The reports MCP-Rubriq produces are
+yours; the license covers the tool, not its output.
 
 ## Security
 

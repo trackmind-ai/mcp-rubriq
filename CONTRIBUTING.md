@@ -137,7 +137,7 @@ git commit -s -m "your commit message"
 
 This is a **Developer Certificate of Origin (DCO)** — a one-line certification that you wrote
 the contribution (or otherwise have the right to submit it) and are licensing it under this
-project's MIT license, not a separate contract to read and sign. It's enforced by an
+project's GNU GPL-3.0-or-later license, not a separate contract to read and sign. It's enforced by an
 automated check on each PR; commits missing the trailer will fail that check. We use DCO
 instead of a CLA specifically to keep the "good first issue" lane genuinely low-friction — a
 first-time contributor fixing a typo shouldn't hit a legal wall before their PR can merge.
