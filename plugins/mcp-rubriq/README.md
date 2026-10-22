@@ -112,4 +112,5 @@ launched with `npx`.
 Rule reference, architecture, testing and boundaries are in the
 [repository](https://github.com/trackmind-ai/mcp-rubriq) (`docs/`). Report problems, false
 positives and rule proposals at <https://github.com/trackmind-ai/mcp-rubriq/issues>.
-Licensed under the MIT License (see the repository `LICENSE`).
+Licensed under the GNU General Public License, version 3 or later (see the repository `LICENSE`).
+Versions up to 0.1.2 were released under the MIT License.

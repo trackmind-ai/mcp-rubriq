@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 Trackmind
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: GPL-3.0-or-later
 #
 # Enforces the two-tier contribution model from CONTRIBUTING.md. Combined with branch
 # protection's "require CODEOWNERS review" (R4.3), this makes the maintainer-gated lanes

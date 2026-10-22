@@ -8,6 +8,7 @@ All notable changes to this project are documented in this file. The format foll
 
 ### Changed
 - Plugin README: added three example prompts and a troubleshooting section.
+- License changed from MIT to GPL-3.0-or-later for new versions. `LICENSE` is now the GNU GPL v3 text, the SPDX headers, `plugin.json` and the README say so, and `CONTRIBUTING.md` states that contributions are licensed under it. Versions up to 0.1.2 stay available under MIT.
 
 ## [0.1.2] — 2026-10-21
 
